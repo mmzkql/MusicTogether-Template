@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcd000afda90ec543add8205ff3def50, type: 3}
+  m_Name: Dark
+  m_EditorClassIdentifier: 
+  StyleName: 
+  ElementBgColor: {r: 0.27450982, g: 0.27450982, b: 0.27450982, a: 1}
+  ElementColor: {r: 1, g: 1, b: 1, a: 1}
+  ElementHighlightedColor: {r: 1, g: 1, b: 1, a: 1}
+  NormalButton:
+    m_NormalColor: {r: 0.27450982, g: 0.27450982, b: 0.27450982, a: 1}
+    m_HighlightedColor: {r: 0.4339623, g: 0.4339623, b: 0.4339623, a: 1}
+    m_PressedColor: {r: 0.22012573, g: 0.22012573, b: 0.22012573, a: 1}
+    m_SelectedColor: {r: 0.27450982, g: 0.27450982, b: 0.27450982, a: 1}
+    m_DisabledColor: {r: 0.40251565, g: 0.40251565, b: 0.40251565, a: 0.5294118}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  HighlighedButton:
+    m_NormalColor: {r: 0, g: 0, b: 0, a: 0}
+    m_HighlightedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_PressedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_SelectedColor: {r: 0, g: 0, b: 0, a: 0}
+    m_DisabledColor: {r: 0, g: 0, b: 0, a: 0}
+    m_ColorMultiplier: 0
+    m_FadeDuration: 0
+  titleFontSize: 0
+  subTitleFontSize: 0
+  labelFontSize: 40
+  elementFontSize: 30
+  font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+  TMP_font: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

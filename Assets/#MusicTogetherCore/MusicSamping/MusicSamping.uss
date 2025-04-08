@@ -1,0 +1,10 @@
+Label {
+    font-size: 12px;
+    -unity-font-style: normal;
+    color: rgb(207, 207, 207);
+    min-width: 50px;
+    top: auto;
+}
+
+#unity-tracker {
+}

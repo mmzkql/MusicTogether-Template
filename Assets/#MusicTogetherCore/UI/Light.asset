@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcd000afda90ec543add8205ff3def50, type: 3}
+  m_Name: Light
+  m_EditorClassIdentifier: 
+  StyleName: Light
+  ElementBgColor: {r: 1, g: 1, b: 1, a: 1}
+  ElementBgHighlightedColor: {r: 0.8616352, g: 0.8616352, b: 0.8616352, a: 1}
+  ElementColor: {r: 0.27450982, g: 0.27450982, b: 0.27450982, a: 1}
+  ElementHighlightedColor: {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 1}
+  ChangeNormalColorTint: 0
+  NormalButton:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  ChangeHighlighedColorTint: 0
+  HighlighedButton:
+    m_NormalColor: {r: 0.7106918, g: 0.7106918, b: 0.7106918, a: 1}
+    m_HighlightedColor: {r: 0.7798742, g: 0.7798742, b: 0.7798742, a: 1}
+    m_PressedColor: {r: 0.61006284, g: 0.61006284, b: 0.61006284, a: 1}
+    m_SelectedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_DisabledColor: {r: 0.41509432, g: 0.41509432, b: 0.41509432, a: 0.57254905}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  titleFontSize: 0
+  subTitleFontSize: 0
+  labelFontSize: 0
+  elementFontSize: 30
+  font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+  TMP_font: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

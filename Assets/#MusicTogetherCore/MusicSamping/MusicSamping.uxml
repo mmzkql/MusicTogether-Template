@@ -1,0 +1,28 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="mainContainer" style="flex-direction: column; padding: 10px; -unity-text-align: upper-center;">
+        <ui:VisualElement name="AudioInfoBox" style="background-color: rgb(68, 68, 68); margin-bottom: 10px; padding: 10px; border-radius: 5px; flex-direction: row; justify-content: space-around;">
+            <uie:ObjectField name="musicField" type="UnityEngine.AudioClip,UnityEngine.AudioModule" label=" Music" style="display: flex; visibility: visible; overflow: hidden; justify-content: flex-start; width: auto; margin-right: 1px; flex-shrink: 1; flex-grow: 1; flex-basis: auto; -unity-text-align: upper-left;" />
+            <uie:IntegerField name="bpmField" label="BPM" value="120" style="justify-content: flex-end; flex-grow: 0; -unity-text-align: upper-left;" />
+            <ui:Button text="GetBPM" display-tooltip-when-elided="true" name="bpmLink" />
+        </ui:VisualElement>
+        <ui:VisualElement name="VideoBox" style="background-color: rgb(68, 68, 68); margin-bottom: 10px; padding: 10px; border-radius: 5px; display: none;">
+            <ui:VisualElement name="videoPreview" style="background-color: rgb(0, 0, 0); height: 200px; display: flex; align-items: center; justify-content: center; margin-right: 4px; margin-left: 4px;">
+                <ui:Image name="videoThumbnail" style="width: 320px; height: auto; object-fit: contain; flex-shrink: 0; flex-grow: 1; justify-content: space-around; align-items: stretch; max-width: 100%; min-width: 60%;" />
+            </ui:VisualElement>
+            <ui:Button name="selectVideoButton" text="Select Video File" />
+        </ui:VisualElement>
+        <ui:VisualElement name="ControlBox" style="background-color: rgb(68, 68, 68); margin-bottom: 10px; padding: 10px; border-radius: 5px; flex-direction: row; align-items: flex-start; justify-content: space-around;">
+            <ui:Button name="rewindButton" text="⇦" style="-unity-text-align: middle-center; flex-direction: row; transform-origin: center; position: relative; left: 0; padding-right: 3px; padding-left: 3px; margin-right: 1px; margin-left: 1px; align-items: stretch; justify-content: flex-start; flex-shrink: 0; flex-grow: 0;" />
+            <ui:Button name="playButton" text="▶" tabindex="1" style="-unity-text-align: middle-center; flex-direction: row; transform-origin: center; position: relative; left: 0; padding-right: 3px; padding-left: 3px; margin-right: 1px; margin-left: 1px; align-items: stretch; justify-content: flex-start; flex-shrink: 0;" />
+            <ui:Button name="fastwardfButton" text="⇨" tabindex="2" style="-unity-text-align: middle-center; flex-direction: row; transform-origin: center; position: relative; left: 0; padding-right: 3px; padding-left: 3px; margin-right: 1px; margin-left: 1px; align-items: stretch; justify-content: flex-start; flex-shrink: 0;" />
+            <ui:Slider name="progressSlider" value="0" low="0" high="1" style="align-items: center; right: auto; left: auto; position: relative; top: auto; max-width: none; width: 525px; min-width: auto; justify-content: space-around; flex-grow: 1; flex-shrink: 1; flex-direction: column; margin-top: 3px;" />
+            <ui:Slider name="zoomSlider" value="1" low="0.5" high="2" label="zoom" style="justify-content: flex-end; align-items: center; right: auto; height: auto; width: 20%; -unity-text-align: middle-center; margin-right: 3px; transform-origin: right; position: relative; top: auto; bottom: auto; min-width: 20px; max-width: 300px; max-height: none; min-height: auto; flex-direction: row; left: auto; flex-shrink: 0; margin-left: 3px; padding-left: 50px; margin-top: 3px;" />
+        </ui:VisualElement>
+        <ui:VisualElement name="WaveformBox" style="background-color: rgb(68, 68, 68); margin-bottom: 10px; padding: 10px; border-radius: 5px; display: flex; flex-direction: column;">
+            <ui:ScrollView mode="Horizontal" name="noteScrollView" style="flex-direction: column;">
+                <ui:Button text="Button" display-tooltip-when-elided="true" name="note" style="width: 500px;" />
+            </ui:ScrollView>
+            <ui:VisualElement name="waveformContainer" style="flex-grow: 1; overflow: hidden; position: relative;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

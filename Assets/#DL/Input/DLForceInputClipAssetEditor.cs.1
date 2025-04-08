@@ -1,0 +1,23 @@
+using UnityEditor;
+using UnityEditor.Timeline;
+using UnityEngine;
+using UnityEngine.Timeline;
+
+using MusicTogether.TimelineKit;
+
+namespace MusicTogether.DancingLine
+{
+    [CustomTimelineEditor(typeof(DLForceInputClipAsset))]
+    public class DLForceInputClipAssetEditor : ClipEditor
+    {
+        // Start is called before the first frame update
+        public override void OnClipChanged(TimelineClip clip)
+        {
+            var clipAsset = clip.asset as DLForceInputClipAsset;
+            if (clipAsset != null)
+            {
+                clip.displayName = $"ForceInputArea";
+            }
+        }
+    }
+}

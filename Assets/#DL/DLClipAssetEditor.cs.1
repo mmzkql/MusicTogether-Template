@@ -1,0 +1,68 @@
+using UnityEditor;
+using UnityEditor.Timeline;
+using UnityEngine;
+using UnityEngine.Timeline;
+
+using MusicTogether.TimelineKit;
+
+namespace MusicTogether.DancingLine
+{
+    // 定义一个共同的接口或基类
+    public interface IDLClipAsset { }
+
+    // 将CustomTimelineEditor应用于接口
+    [CustomTimelineEditor(typeof(BaseClipAsset<>))]
+    public class DLClipAssetEditor : ClipEditor
+    {
+        public override void OnCreate(TimelineClip clip, TrackAsset track, TimelineClip clonedFrom)
+        {
+            base.OnCreate(clip, track, clonedFrom);
+            Debug.Log("OnClipCreated called for clip: " + clip.displayName);
+        }
+        public override void OnClipChanged(TimelineClip clip)
+        {
+            base.OnClipChanged(clip);
+            Debug.Log("OnClipChanged called for clip: " + clip.displayName);
+            // 判断Clip类型并设置对应的标题
+
+            if (clip.asset is DLMoveClipAsset)
+            {
+                var clipAsset = clip.asset as DLMoveClipAsset;
+                if (clipAsset.turnDatas != null && clipAsset.turnDatas.Length > 0)
+                {
+                    clip.displayName = $"BeginAt{clipAsset.turnDatas[0].StartPoint}, Speed:{clipAsset.Speed}";
+                }
+                else
+                {
+                    clip.displayName = "BeginAt, Speed: (No Turn Data)";
+                }
+            }
+            else if (clip.asset is DLInputClipAsset)
+            {
+                clip.displayName = "InputArea";
+            }
+            else if (clip.asset is DLForceInputClipAsset)
+            {
+                clip.displayName = "ForceInputArea";
+            }
+        }
+        /*public override void OnClipChanged(TimelineClip clip)
+        {
+            base.OnClipChanged(clip);
+            // 判断Clip类型并设置对应的标题
+            switch(clip.asset)
+            {
+                case DLMoveClipAsset:
+                    var clipAsset = clip.asset as DLMoveClipAsset;
+                    clip.displayName = $"BeginAt{clipAsset.turnDatas[0].StartPoint}, Speed:{clipAsset.Speed}";
+                    break;
+                case DLInputClipAsset:
+                    clip.displayName = "InputArea";
+                    break;
+                case DLForceInputClipAsset:
+                    clip.displayName = "ForceInputArea";
+                    break;
+            }
+        }*/
+    }
+}

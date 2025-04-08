@@ -1,0 +1,14 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+using MusicTogether.TimelineKit;
+
+namespace MusicTogether.DancingLine
+{
+    public class DLForceInputClipAsset : BaseClipAsset<DLInputBehaviour>
+    {
+        [HideInInspector] public DLController dlController;//[修1]这应该是一个失败的设计，需要修改
+        [HideInInspector] public List<float> AutoInputTimes;
+    }
+}
