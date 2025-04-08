@@ -9,7 +9,8 @@ namespace MusicTogether.DancingBall
     {
         //BasicStyle
         [DisableIf("@!(isTurnNode||isCorner)")] 
-        public RoadType roadType;
+        public RoadPlacementType roadType;
+        public float scale;
         [Title("Data")]
         [PropertySpace]
         [DisableIf("@inherit == true")]

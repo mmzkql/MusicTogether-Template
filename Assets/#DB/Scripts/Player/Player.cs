@@ -26,24 +26,29 @@ namespace MusicTogether.DancingBall
         public BlockNode targetBlock;
         private int _targetBlockIndex;
         
+        private bool _teleport;
         //node
         private Transform[] _nodes;
         private int _targetNodeIndex;
-        public float beginTime,speed,endTime;
-        private Vector3 _beginPoint= Vector3.zero,_endPoint= Vector3.zero;
-        private Vector3 Direction=>transform.forward;
+        //public float speed;
+        //Value
+        private TimeRange _timeRange;
+        private Vector3 _beginPoint = Vector3.zero,_displacementVector=Vector3.zero;
+        //private Vector3 _beginPoint= Vector3.zero,_endPoint= Vector3.zero;
+        //private Vector3 Direction=>transform.forward;
         
         private float _nowTime=>(float)director.time;
         // Start is called before the first frame update
         void Move()
         {
             //Debug.Log($"{_beginPoint}+{Direction}*({_nowTime}-{beginTime})/{_unitTime}");
-            transform.position = _beginPoint + Direction * (speed * Mathf.Abs((_nowTime - beginTime)));
+            transform.position = _beginPoint + _displacementVector*_timeRange.GetProgress(_nowTime);
+            //transform.position = _beginPoint + Direction * (speed * Mathf.Abs((_nowTime - beginTime)));
         }
 
         void GetNodeData()
         {
-            if(_targetBlockIndex==0)
+            if(_teleport)
             {
                 _beginPoint = targetBlock.nodes[0].position+ballScale*targetBlock.nodes[0].up;
             }
@@ -51,24 +56,28 @@ namespace MusicTogether.DancingBall
             {
                 _beginPoint = transform.position;
             }
-            _endPoint = targetBlock.nodes[_targetNodeIndex].position+ballScale*targetBlock.nodes[_targetNodeIndex].up;
-            beginTime = _nowTime;
-            endTime = (float)InputNoteDatas.GetTime(_bpm, _noteType, targetBlock.nodeIndex + _managerBegin) +
-                      _unitTime * ((_targetNodeIndex - 0.5f) * 0.2f);//((_targetNodeIndex+0.5f)/targetBlock.nodes.Count-0.5f);
+            _displacementVector = targetBlock.nodes[_targetNodeIndex].position - _beginPoint;
+            //_endPoint = targetBlock.nodes[_targetNodeIndex].position+ballScale*targetBlock.nodes[_targetNodeIndex].up;
             
-            transform.LookAt(_endPoint);
-            speed = (_beginPoint-_endPoint).magnitude/(endTime-beginTime);
+            float beginTime = _nowTime;
+            float endTime = (float)InputNoteDatas.GetTime(_bpm, _noteType, targetBlock.nodeIndex + _managerBegin) +
+                      _unitTime * ((_targetNodeIndex - 0.5f) * 0.2f);//((_targetNodeIndex+0.5f)/targetBlock.nodes.Count-0.5f);
+            _timeRange = new TimeRange(beginTime,endTime);
+
+            //transform.LookAt(_endPoint);
+            //speed = (_beginPoint-_endPoint).magnitude/(endTime-beginTime);
             
             for (int i = 10; i > 1; i--)
             {
                 lineRenderer.SetPosition(i,lineRenderer.GetPosition(i-1));
             }
             lineRenderer.SetPosition(1,_beginPoint);
-            lineRenderer.SetPosition(0,_endPoint);
+            lineRenderer.SetPosition(0,_beginPoint + _displacementVector);
         }
         void GetBlockData()
         {
             targetBlock =targetManager.Nodes[_targetBlockIndex];
+            _teleport = targetBlock.isTeleportNode;
             GetNodeData();
         }
 

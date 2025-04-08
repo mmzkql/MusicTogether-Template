@@ -8,44 +8,25 @@ using UnityEngine.Playables;
 
 namespace MusicTogether.DancingBall
 {
-    public static class Vector3Extensions
-    {
-        public static Vector3 Round(this Vector3 vector)
-        {
-            return new Vector3(
-                Mathf.Round(vector.x),
-                Mathf.Round(vector.y),
-                Mathf.Round(vector.z)
-            );
-        }
-    }
-
-/*方块ID
-0 ???
-1 ????? 9????
-
-100-???????
-
-
-*/
     //[ExecuteAlways]
     public class BlockNode : MonoBehaviour
     {
-        //dependencies
-        [HideInInspector] public RoadManager nodeManager;
-        private PlayableDirector director;
-        public BlockStyle style;
-        public TapPlacer tapPlacer;
-        //Data
+        //Dependencies
+        [HideInInspector]public RoadManager roadManager;
+        public BlockStyle styleApplier;
+        public Renderer blockMask;
+        //Information
         public int nodeIndex;
+        //Config
         public bool isTurnNode, isCorner ,isTeleportNode;
+        //
+
+        //dependencies
+        //[HideInInspector] public RoadManager nodeManager;
+        //public TapPlacer tapPlacer;
+        //Data
         
-        
-        
-        [HideInInspector] public float scale;
-        
-        [Title("Debug")] public Renderer blockMask;
-        public Color normalColor,turnColor,styleColor,turnAndStyleColor;
+        //[Title("Debug")] 
         private Color nowColor
         {
             get

@@ -9,22 +9,35 @@ namespace MusicTogether.DancingBall
 {
     public class RoadManager : MonoBehaviour
     {
-        [Title("Generator")]
-        public InputNoteDatas inputData;
-        public NoteType noteProcessType;
-        public int begin, end;
+        //Dependencies
+        public MapManager mapManager;
 
-        [Title("Data")] public int BPM;
-        public float Scale;
-        public bool enableJustify = false;
-        public GameObject RoadUnitPrefab;
+        //basicConfig
+        public int noteBegin, noteEnd;
+        public bool justifyPlacement;
+
+        //   -managerData
+        public InheritSetting managerDataType;
+        public ManagerData data;
+        //   -blockData这里要改
+        //{        //public bool customScale;
+        //public bool customBlockPrefab;
+        //public bool customTapPlacer;}
+        public InheritSetting defaultBlockDataType;
+        public BlockData defaultBlockData;
+
+        [Title("Data")] 
+        //public int BPM;
+        //public float Scale;
+        //public bool enableJustify = false;
+        //public GameObject RoadUnitPrefab;
         
         [Title("Manager")]
         public List<BlockNode> Nodes;
-        public List<int> TurnIndexes;
-        public List<int> StyleIndexes;
+        //public List<int> TurnIndexes;
+        //public List<int> StyleIndexes;
         //RuntimeData
-        public MapManager mapManager;
+        //public MapManager mapManager;
         [HideInInspector]public int childCount;
         //public MoveBlock[] brickUnits;
         

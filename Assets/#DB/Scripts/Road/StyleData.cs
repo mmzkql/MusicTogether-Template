@@ -8,23 +8,6 @@ namespace MusicTogether.DancingBall
 {
     public enum RoadType { Classic, Chebyshev, Free, DontChange }
     public enum FacingDirection{Up,Back,Right,Left,Front,Down}
-    [Serializable]
-    public class TimeRange
-    {
-        [HorizontalGroup("time")]public float startTime;
-        [HorizontalGroup("time")]public float endTime;
-
-        public TimeRange(int begin, int end)
-        {
-            startTime = begin;
-            endTime = end;
-        }
-        public float GetProgress(float currentTime)
-        {
-            return (currentTime - startTime) / (endTime - startTime);
-        }
-    }
-
     public enum AnimationType { Transform, Color ,Animation}
     public enum TransformAnimationType { Position, Rotation, Scale }
     [Serializable]
