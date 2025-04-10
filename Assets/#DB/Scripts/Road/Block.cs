@@ -8,19 +8,20 @@ namespace MusicTogether.DancingBall
     public class BlockStyle : MonoBehaviour
     {
         //BasicStyle
-        [DisableIf("@!(isTurnNode||isCorner)")] 
-        public RoadPlacementType roadType;
-        public float scale;
-        [Title("Data")]
+        //[DisableIf("@!(isTurnNode||isCorner)")] 
+        //public RoadPlacementStyle roadType;
+        //public float scale;
+        
+        /*[Title("Data")]
         [PropertySpace]
         [DisableIf("@inherit == true")]
         public FacingDirection tileDirection = FacingDirection.Down;
         [DisableIf("@inherit == true")]
         public bool doubleDirection;
         [DisableIf("@inherit == true||!doubleDirection")]
-        public FacingDirection tileDirection2 = FacingDirection.Down;
+        public FacingDirection tileDirection2 = FacingDirection.Down;*/
         
-        [ShowInInspector, HideLabel, ReadOnly, PreviewField(ObjectFieldAlignment.Left, Height = 50)]
+        /*[ShowInInspector, HideLabel, ReadOnly, PreviewField(ObjectFieldAlignment.Left, Height = 50)]
         [BoxGroup("Anchor", ShowLabel = true,CenterLabel = true)][HorizontalGroup("Anchor/Content")] 
         private Texture2D _anchorTexture;
         
@@ -32,13 +33,14 @@ namespace MusicTogether.DancingBall
         [PropertyRange(-0.5f, 0.5f), OnValueChanged("UpdateCoordinateSystemTexture")]
         [VerticalGroup("Anchor/Content/Coordinates")]
         [DisableIf("@inherit == true")]
-        public float y;
+        public float y;*/
 
         //AdvancedStyle
-        public bool inheritStyleData = true;
-        [InlineEditor(InlineEditorObjectFieldModes.Boxed)]
+        //public bool inheritStyleData = true;
+        
+        /*[InlineEditor(InlineEditorObjectFieldModes.Boxed)]
         [DisableIf("@inherit == true")] 
-        public StyleData styleData;
+        public StyleData styleData;*/
 
 
         [Title("Dependencies")] public Transform tileHolder;
@@ -68,7 +70,7 @@ namespace MusicTogether.DancingBall
         public Dictionary<FacingDirection, MeshFilter> _directionTransforms;
         private FacingDirection _prevDirection;
         
-        private void UpdateCoordinateSystemTexture()
+        /*private void UpdateCoordinateSystemTexture()
         {
             int size = 100;
             _anchorTexture = new Texture2D(size, size);
@@ -115,12 +117,12 @@ namespace MusicTogether.DancingBall
             }
 
             _anchorTexture.Apply();
-        }
+        }*/
 
-        public void UpdateData(RoadManager roadManager,int nodeIndex,bool inheritBasicStyle)
+        public void UpdateData(RoadMaker roadMaker,int nodeIndex,bool inheritBasicStyle)
         {
-            List<int> styleIndex = roadManager.StyleIndexes;
-            List<BlockNode> nodes = roadManager.Nodes;
+            List<int> styleIndex = roadMaker.StyleIndexes;
+            List<BlockMaker> nodes = roadMaker.nodes;
             
             int lastCornerIndex = nodes.FindLastIndex((i) =>i.nodeIndex< nodeIndex && (i.isCorner||i.isTurnNode));
             lastCornerIndex = Mathf.Clamp(lastCornerIndex, 0, styleIndex.Count - 1);
@@ -142,7 +144,7 @@ namespace MusicTogether.DancingBall
             {
                 if (nodeIndex != 0)
                 {
-                    var prevstyle = roadManager.Nodes[styleIndex[lastStyleDataIndex]].style;
+                    var prevstyle = roadMaker.nodes[styleIndex[lastStyleDataIndex]].style;
                     if(prevstyle.doubleDirection&& tileDirection!=prevstyle.tileDirection)
                     {
                         _prevDirection = prevstyle.tileDirection2;
@@ -160,7 +162,7 @@ namespace MusicTogether.DancingBall
             }
             
             tileHolder.localEulerAngles = new Vector3(-transform.localEulerAngles.x,0,0);
-            if (roadType == RoadType.Free)
+            if (roadType == RoadPlacementStyle.Free)
             {
                 tileHolder.GetChild(0).localEulerAngles = transform.localEulerAngles;
             }

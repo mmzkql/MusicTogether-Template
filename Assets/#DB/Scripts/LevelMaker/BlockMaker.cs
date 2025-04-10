@@ -5,40 +5,41 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Playables;
+using UnityEngine.Serialization;
 
 namespace MusicTogether.DancingBall
 {
     //[ExecuteAlways]
-    public class BlockNode : MonoBehaviour
+    public class BlockMaker : MonoBehaviour
     {
         //Dependencies
-        [HideInInspector]public RoadManager roadManager;
-        public BlockStyle styleApplier;
-        public Renderer blockMask;
+        private static MapMaker TargetMapMaker=>MapMaker.Instance;
+        [HideInInspector]public RoadMaker targetRoadMaker;
+        public Block targetBlock;
+        
+        public Renderer debugBlock;
         //Information
         public int nodeIndex;
         //Config
-        public bool isTurnNode, isCorner ,isTeleportNode;
-        //
-
-        //dependencies
-        //[HideInInspector] public RoadManager nodeManager;
-        //public TapPlacer tapPlacer;
+        public bool isTurnNode, isCorner ,teleport,jump;
         //Data
+        public BlockPlacementData customPlacementData;
+        public StyleDataInheritOption styleDataOption;
+        public BlockStyleData customStyleData;
         
-        //[Title("Debug")] 
-        private Color nowColor
+        private Color DebugMaskColor
         {
             get
             {
                 if(isTurnNode||isCorner)
                 {
-                    if(!style.inheritStyleData) return turnAndStyleColor;
-                    return turnColor;
+                    if (styleDataOption == StyleDataInheritOption.Custom)
+                        return TargetMapMaker.turnAndStyleMaskColor;
+                    return TargetMapMaker.turnMaskColor;
                 }
-                if (!style.inheritStyleData)
-                    return styleColor;
-                return normalColor;
+                if (styleDataOption == StyleDataInheritOption.Custom)
+                    return TargetMapMaker.styleMaskColor;
+                return TargetMapMaker.normalMaskColor;
             }
         }
 
@@ -57,20 +58,20 @@ namespace MusicTogether.DancingBall
         {
             nodeManager.UpdateBlockPosAndStyle(nodeIndex);
         }
-        public void ResetValue(RoadManager manager)
+        public void ResetValue(RoadMaker maker)
         {
-            nodeManager = manager;
-            director = manager.mapManager.director;
+            nodeManager = maker;
+            director = maker.mapMaker.director;
             scale = nodeManager.Scale;
             transform.localScale = new Vector3(scale, scale, scale);
             if (nodeIndex == 0)
                 style.inheritStyleData = false;
             DebugStyle();
         }
-        public void ResetValue(RoadManager manager, int index)
+        public void ResetValue(RoadMaker maker, int index)
         {
             nodeIndex = index;
-            ResetValue(manager);
+            ResetValue(maker);
         }
 
         public void UpdateStyle()
@@ -92,17 +93,17 @@ namespace MusicTogether.DancingBall
             Vector3 target = Vector3.zero;
             switch (style.roadType)
             {
-                case RoadType.Free:
+                case RoadPlacementStyle.Free:
                     target = normalPosition(prevPosition, prevRotation, Length);
                     break;
-                case RoadType.Classic:
+                case RoadPlacementStyle.Classic:
                     target = chebyshevPosition(prevPosition, prevRotation,
                         Length); //strictPosition(prevPosition, eulerAngles, Length);
                     break;
-                case RoadType.Chebyshev:
+                case RoadPlacementStyle.Chebyshev:
                     target = chebyshevPosition(prevPosition, prevRotation, Length);
                     break;
-                case RoadType.DontChange:
+                case RoadPlacementStyle.DontChange:
                     target = transform.position;
                     break;
             }
@@ -110,23 +111,23 @@ namespace MusicTogether.DancingBall
         }
         public void DebugStyle()
         {
-            if (blockMask != null)
+            if (debugBlock != null)
             {
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                blockMask.GetPropertyBlock(propBlock);
+                debugBlock.GetPropertyBlock(propBlock);
             
                 // 设置颜色属性
-                propBlock.SetColor("_Color", nowColor);
+                propBlock.SetColor("_Color", DebugMaskColor);
             
                 // 应用PropertyBlock
-                blockMask.SetPropertyBlock(propBlock);
+                debugBlock.SetPropertyBlock(propBlock);
             }
-            if (style.roadType == RoadType.Free)
+            if (style.roadType == RoadPlacementStyle.Free)
             {
-                blockMask.transform.localEulerAngles = Vector3.zero;
+                debugBlock.transform.localEulerAngles = Vector3.zero;
             }
             else
-                blockMask.transform.eulerAngles = Vector3.zero;
+                debugBlock.transform.eulerAngles = Vector3.zero;
         }
         private void Awake()
         {
@@ -210,7 +211,7 @@ namespace MusicTogether.DancingBall
 
             if (justifyRotation)
             {
-                if(style.roadType == RoadType.Classic)
+                if(style.roadType == RoadPlacementStyle.Classic)
                     transform.localEulerAngles = (transform.localEulerAngles / 45).Round() * 45;
                 if (!isTurnNode) isCorner = true;
                 justifyRotation = false;

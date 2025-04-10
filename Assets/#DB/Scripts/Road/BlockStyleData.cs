@@ -1,15 +1,12 @@
 using System;
 using JetBrains.Annotations;
+using MusicTogether.General;
 using Sirenix.OdinInspector;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace MusicTogether.DancingBall
 {
-    public enum RoadType { Classic, Chebyshev, Free, DontChange }
-    public enum FacingDirection{Up,Back,Right,Left,Front,Down}
-    public enum AnimationType { Transform, Color ,Animation}
-    public enum TransformAnimationType { Position, Rotation, Scale }
     [Serializable]
     public class StyleAnimation
     {
@@ -134,9 +131,8 @@ namespace MusicTogether.DancingBall
     {
         [FoldoutGroup("BasicData")]
         [PreviewField]
-        public Mesh tileMesh;
+        public GameObject blockPrefab,tapPlacerPrefab;
         
-        public GameObject tapPrefab;
         public Gradient tapColorGradient;
         public TimeRange tapTimeRange=new TimeRange(-2,2);
         public float fadeTime;
