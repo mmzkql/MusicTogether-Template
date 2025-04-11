@@ -24,7 +24,7 @@ namespace MusicTogether.DancingLine
             _controller = binding as DLController;
             _data = GetData<DLGravityClipAsset>();
 
-            if (_controller == null || !_data)//Ó¦¸ÃÖ»·¢ÉúÔÚµ¹ÍË»ØÆğµãµÄÇé¿öÏÂ
+            if (_controller == null || !_data)//åº”è¯¥åªå‘ç”Ÿåœ¨å€’é€€å›èµ·ç‚¹çš„æƒ…å†µä¸‹
             {
                 //Debug.LogError("DLPlayer binding is null!");
                 return;
@@ -33,7 +33,7 @@ namespace MusicTogether.DancingLine
             playerRigibody = player.GetComponent<Rigidbody>();
             _type = _data.Type;
 
-            Debug.Log($"Ê±¼ä{GlobalTime}£¬½ÇËÙ¶È{playerRigibody.angularVelocity}£¬ÏßËÙ¶È{playerRigibody.velocity}£¬Î»ÖÃ{playerRigibody.position}");
+            Debug.Log($"æ—¶é—´{GlobalTime}ï¼Œè§’é€Ÿåº¦{playerRigibody.angularVelocity}ï¼Œçº¿é€Ÿåº¦{playerRigibody.velocity}ï¼Œä½ç½®{playerRigibody.position}");
 
             switch (_type)
             {

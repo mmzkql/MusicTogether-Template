@@ -9,118 +9,120 @@ namespace MusicTogether.DancingBall
 {
     public class Player : MonoBehaviour
     {
-        public MapManager mapManager;
         public float ballScale;
         public LineRenderer lineRenderer;
-        //Level
-        public PlayableDirector director;
-        //manager
-        public RoadManager targetManager;
-        private int _targetManagerIndex;
+
+        public MapHolder MapHolder=>MapHolder.Instance;
+        public RoadHolder targetRoadHolder;
+        public BlockHolder targetBlockHolder;
+        public static Player Instance;
+        
+        private PlayableDirector Director=>MapHolder.director;
+        private float NowTime=>(float)MapHolder.director.time;
+        
+        
+        public int targetRoadIndex;
+        public int targetBlockIndex;
+        private int _nextRoadIndex;
+        private int _nextBlockIndex;
+        private int _targetNodeIndex;
+        
+        //RoadData
         private int _bpm;
         private float _unitTime,_scale;
         private NoteType _noteType;
-        private int _managerBegin;
+        private int _managerNoteBegin;
         
-        //block
-        public BlockNode targetBlock;
-        private int _targetBlockIndex;
-        
-        private bool _teleport;
-        //node
+        //BlockData
+        private bool _teleportToNext;
+        private bool _nextIsTurn;
         private Transform[] _nodes;
-        private int _targetNodeIndex;
-        //public float speed;
-        //Value
-        private TimeRange _timeRange;
-        private Vector3 _beginPoint = Vector3.zero,_displacementVector=Vector3.zero;
-        //private Vector3 _beginPoint= Vector3.zero,_endPoint= Vector3.zero;
-        //private Vector3 Direction=>transform.forward;
         
-        private float _nowTime=>(float)director.time;
-        // Start is called before the first frame update
+        //Value
+        private TimeRange _moveTimeRange;
+        private Vector3 _beginPoint = Vector3.zero;
+        private Vector3 _displacementVector=Vector3.zero;
+
+        
         void Move()
         {
-            //Debug.Log($"{_beginPoint}+{Direction}*({_nowTime}-{beginTime})/{_unitTime}");
-            transform.position = _beginPoint + _displacementVector*_timeRange.GetProgress(_nowTime);
+            transform.position = _beginPoint + _displacementVector*_moveTimeRange.GetProgress(NowTime);
             //transform.position = _beginPoint + Direction * (speed * Mathf.Abs((_nowTime - beginTime)));
         }
-
+        
         void GetNodeData()
         {
-            if(_teleport)
+            _displacementVector = targetBlockHolder.nodes[_targetNodeIndex].position - _beginPoint;
+            
+            float beginTime = NowTime;
+            float endTime = beginTime;
+            if (targetBlockHolder.nodes.Count > 1)
             {
-                _beginPoint = targetBlock.nodes[0].position+ballScale*targetBlock.nodes[0].up;
+                endTime = (float)InputNoteDatas.GetTime(_bpm, _noteType, targetBlockHolder.nodeIndex + _managerNoteBegin) +
+                                _unitTime * ((_targetNodeIndex - 0.5f) * 0.2f);
+                //((_targetNodeIndex+0.5f)/targetBlock.nodes.Count-0.5f);
             }
             else
             {
-                _beginPoint = transform.position;
+                endTime = (float)InputNoteDatas.GetTime(_bpm, _noteType, targetBlockHolder.nodeIndex + _managerNoteBegin);
             }
-            _displacementVector = targetBlock.nodes[_targetNodeIndex].position - _beginPoint;
-            //_endPoint = targetBlock.nodes[_targetNodeIndex].position+ballScale*targetBlock.nodes[_targetNodeIndex].up;
+            _moveTimeRange = new TimeRange(beginTime,endTime);
             
-            float beginTime = _nowTime;
-            float endTime = (float)InputNoteDatas.GetTime(_bpm, _noteType, targetBlock.nodeIndex + _managerBegin) +
-                      _unitTime * ((_targetNodeIndex - 0.5f) * 0.2f);//((_targetNodeIndex+0.5f)/targetBlock.nodes.Count-0.5f);
-            _timeRange = new TimeRange(beginTime,endTime);
-
-            //transform.LookAt(_endPoint);
-            //speed = (_beginPoint-_endPoint).magnitude/(endTime-beginTime);
-            
-            for (int i = 10; i > 1; i--)
+            if(false)
             {
-                lineRenderer.SetPosition(i,lineRenderer.GetPosition(i-1));
+                for (int i = 10; i > 1; i--)
+                {
+                    lineRenderer.SetPosition(i, lineRenderer.GetPosition(i - 1));
+                }
+
+                lineRenderer.SetPosition(1, _beginPoint);
+                lineRenderer.SetPosition(0, _beginPoint + _displacementVector);
             }
-            lineRenderer.SetPosition(1,_beginPoint);
-            lineRenderer.SetPosition(0,_beginPoint + _displacementVector);
         }
         void GetBlockData()
         {
-            targetBlock =targetManager.Nodes[_targetBlockIndex];
-            _teleport = targetBlock.isTeleportNode;
+            targetBlockHolder =targetRoadHolder.blockHodlers[targetBlockIndex];
+            _teleportToNext = targetBlockHolder.teleport;
             GetNodeData();
         }
 
-        void GetManagerData()
+        void GetRoadData()
         {
-            targetManager = mapManager.roadManagers[_targetManagerIndex];
+            targetRoadHolder = MapHolder.roadHolders[targetRoadIndex];
 
-            _bpm = targetManager.BPM;
-            _noteType = targetManager.noteProcessType;
+            _bpm = targetRoadHolder.musicData.bpm;
+            _noteType = targetRoadHolder.musicData.noteProcessType;
             _unitTime = (float)InputNoteDatas.GetTime(_bpm,_noteType,1);
-            _scale= targetManager.Scale;
-            _managerBegin = targetManager.begin;
+            _managerNoteBegin = targetRoadHolder.noteBegin;
             
             GetBlockData();
         }
 
         private void Start()
         {
-            _targetManagerIndex = 0;
-            _targetBlockIndex = 0;
+            targetRoadIndex = 0;
+            targetBlockIndex = 0;
             _targetNodeIndex = 0;
-            GetManagerData();
-            GetBlockData();
-            GetNodeData();
+            GetRoadData();
         }
 
         void Update()
         {
-            if (targetBlock.isTurnNode&&_targetNodeIndex == 0)
+            if (targetBlockHolder.isTurn && _targetNodeIndex==0)
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    targetBlock.tapPlacer.tap();
+                    targetBlockHolder.tapPlacer.Tap();
                     GetNextNode(1);
                 }
             }
-            /*else if (targetManager.Nodes.Count > _targetBlockIndex+2 && targetManager.Nodes[_targetBlockIndex+1].isTurnNode)
+            else if (_nextIsTurn)
             {
                 if(Input.GetMouseButtonDown(0))
                 {
-                    GetNextBlock(2);
+                    GetNextBlock(1);
                 }
-            }*/
+            }
             /*else if (targetManager.Nodes.Count > _targetBlockIndex+3 && targetManager.Nodes[_targetBlockIndex+2].isTurnNode)
             {
                 if(Input.GetMouseButtonDown(0))
@@ -128,12 +130,11 @@ namespace MusicTogether.DancingBall
                     GetNextBlock(3);
                 }
             }*/
-            else if (_nowTime > endTime)
+            else if (NowTime > _moveTimeRange.endTime)
             {
                 GetNextNode(1);
             }
-
-            //DataManagement();
+            
             Move();
         }
 
@@ -146,42 +147,40 @@ namespace MusicTogether.DancingBall
         void GetNextBlock(int step)
         {
             _targetNodeIndex = 0;
-            _targetBlockIndex += step;
+            _nextBlockIndex = targetBlockIndex + step;
             DataManagement();
         }
         void DataManagement()
         {
             if(_targetNodeIndex<0)
                 _targetNodeIndex=0;
-            if(_targetBlockIndex<0)
-                _targetBlockIndex=0;
-            if(_targetManagerIndex<0)
-                _targetManagerIndex=0;
-            if(targetBlock.nodes.Count > _targetNodeIndex)//if next node exists
-            { 
-                GetNodeData();
+            if (_targetNodeIndex > _nodes.Length - 1)
+            {
+                _targetNodeIndex=0;
+                GetNextBlock(1);
                 return;
             }
 
-            _targetNodeIndex = 0;
-            _targetBlockIndex++;
-            if (targetManager.Nodes.Count > _targetBlockIndex)//if next block exists
+            if (!MapHolder.CorrectBlockIndex(_nextRoadIndex, _nextBlockIndex, out _nextRoadIndex,
+                    out _nextBlockIndex))
             {
-                GetBlockData();
-                //DataManagement();
                 return;
             }
-            _targetBlockIndex = 0;
-            _targetManagerIndex++;
-            if (mapManager.roadManagers.Length > _targetManagerIndex)
+
+            if (_nextRoadIndex != targetRoadIndex)
             {
-                GetManagerData();
+                GetRoadData();
+                targetRoadIndex = _nextRoadIndex;
+                return;
             }
-            else
+
+            if (_nextBlockIndex != targetBlockIndex)
             {
-                _targetManagerIndex = mapManager.roadManagers.Length - 1;
-                GetManagerData();
+                GetBlockData();
+                targetBlockIndex = _nextBlockIndex;
+                return;
             }
+            GetNodeData();
         }
     }
 }

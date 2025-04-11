@@ -1,16 +1,11 @@
-using System.Collections;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Playables;
-using UnityEngine.Serialization;
 
 namespace MusicTogether.DancingBall
 {
     public class MapMaker : MonoBehaviour
     {
-        [Title("Necessities")]
-        public PlayableDirector director;
         public static MapMaker Instance;
         [Title("DefaultDatas")]
         public bool drawTrack,drawBlockMask;
@@ -23,6 +18,13 @@ namespace MusicTogether.DancingBall
         [Title("Debug")]
         public Color normalMaskColor,turnMaskColor,styleMaskColor,turnAndStyleMaskColor;
         [Title("Manager")]
-        public RoadMaker[] roadManagers;
+        public List<RoadMaker> roadManagers;
+        public void UpdateManager(int beginIndex)
+        {
+            for (int i = beginIndex; i < roadManagers.Count; i++)
+            {
+                roadManagers[i].UpdateData(i);
+            }
+        }
     }
 }

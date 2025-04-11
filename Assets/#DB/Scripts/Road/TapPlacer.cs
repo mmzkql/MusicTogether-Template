@@ -1,53 +1,54 @@
 using System.Collections;
 using System.Collections.Generic;
 using MusicTogether.General;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Assertions.Must;
 using UnityEngine.Playables;
+using UnityEngine.Serialization;
 
 namespace MusicTogether.DancingBall
 {
     public class TapPlacer : MonoBehaviour
     {
-        public StyleData styleData;
+        
+        [TabGroup("PrefabSettings")]
         public MeshRenderer[] circleCorners;
+        [TabGroup("PrefabSettings")]
         public MeshRenderer tapEffect;
         
-        private PlayableDirector director;
-        private double nowTime => director.time;
+        private static PlayableDirector Director=>MapHolder.Instance.director;
+        private double NowTime => Director.time;
         
-        private Gradient tapColorGradient;
+        //public BlockStyleData blockStyleData;
+        public TapPlacerData tapPlacerData;
+        
+        private float BeginRadius=>tapPlacerData.beginRadius;
+        private TimeRange TapTimeRange => tapPlacerData.tapTimeRange;
+        private AnimationCurve RadiusCurve=>tapPlacerData.radiusCurve;
+        private Gradient TapColorGradient=>tapPlacerData.tapColorGradient;
+        private float FadeTime=>tapPlacerData.fadeTime;
+        private AnimationCurve FadeAlphaCurve=>tapPlacerData.fadeAlphaCurve;
+        
+        
         public int noteIndex;
-        private TimeRange tapTimeRange = new TimeRange(0,0);
-        private float fadeTime;
-        private AnimationCurve _fadeAlpha;
-        private float beginRadius;
-        private float angle;
-        private float tapTime;
-        private float value => tapTimeRange.GetProgress((float)nowTime);
+        private TimeRange _tapTimeRange = new TimeRange(0,0);
+        private float _angle;
+        private float _tapTime;
+        private float Value => _tapTimeRange.GetProgress((float)NowTime);
 
-        private bool enabled = false,tapped = false;
+        private bool _enabled = false,_tapped = false;
         
         //private MaterialPropertyBlock circlePropBlock = new MaterialPropertyBlock(),tapPropBlock= new MaterialPropertyBlock();
         public Color tapColor;
         // Start is called before the first frame update
-        public void StartTap(BlockNode blockNode,int BPM,NoteType noteType,int note)
+        public void StartTap(BlockHolder blockHolder,int bpm,NoteType noteType,int note)
         {
-            noteIndex=blockNode.nodeIndex + blockNode.nodeManager.begin;
+            noteIndex=blockHolder.nodeIndex + blockHolder.roadHolder.noteBegin;
             //note = blockNode.nodeIndex + blockNode.nodeManager.begin;
-            director = blockNode.nodeManager.mapManager.director;
-            
-            tapColorGradient = styleData.tapColorGradient;
-            
-            tapTimeRange.startTime = styleData.tapTimeRange.startTime;
-            tapTimeRange.endTime = styleData.tapTimeRange.endTime;
-            fadeTime = styleData.fadeTime;
-            _fadeAlpha = styleData.fadeAlpha;
-            
-            beginRadius = styleData.beginRadius;
-            angle = 360/circleCorners.Length;
-            tapTimeRange.startTime = (float)InputNoteDatas.GetTime(BPM, noteType, noteIndex+styleData.tapTimeRange.startTime);//note+styleData.tapTimeRange.startTime
-            tapTimeRange.endTime = (float)InputNoteDatas.GetTime(BPM, noteType, noteIndex+styleData.tapTimeRange.endTime);//note+styleData.tapTimeRange.endTime
+            _angle = 360/circleCorners.Length;
+            _tapTimeRange.startTime = (float)InputNoteDatas.GetTime(bpm, noteType, TapTimeRange.startTime);//note+styleData.tapTimeRange.startTime
+            _tapTimeRange.endTime = (float)InputNoteDatas.GetTime(bpm, noteType, TapTimeRange.endTime);//note+styleData.tapTimeRange.endTime
             
             //circleCorners[0].GetPropertyBlock(circlePropBlock);
             //tapEffect.GetPropertyBlock(tapPropBlock);
@@ -61,29 +62,28 @@ namespace MusicTogether.DancingBall
             //tapEffect.SetPropertyBlock(tapPropBlock);
             
             tapEffect.gameObject.SetActive(false);
-            enabled=true;
-            Debug.Log($"{styleData.GetInstanceID()},{styleData.tapTimeRange.GetHashCode()},{styleData.tapTimeRange.startTime}");
+            _enabled=true;
+            //Debug.Log($"{blockStyleData.GetInstanceID()},{blockStyleData.tapTimeRange.GetHashCode()},{blockStyleData.tapTimeRange.startTime}");
         }
 
         void Update()
         {
-            if (!enabled) return;
-            if(nowTime < tapTimeRange.startTime)return;
+            if (!_enabled) return;
+            if(NowTime < _tapTimeRange.startTime)return;
             
             for (int i = 0; i < circleCorners.Length; i++)
             {
-                circleCorners[i].transform.localEulerAngles = new Vector3(0, i*angle, 0);
+                circleCorners[i].transform.localEulerAngles = new Vector3(0, i*_angle, 0);
                 circleCorners[i].gameObject.SetActive(true);
                 Debug.Log("SetActive");
             }
 
-            if (tapped)
+            if (_tapped)
             {
                 //tapColor = styleData.tapColorGradient.Evaluate(Mathf.Abs(value));
                 //tapColor = new Color(tapColor.r, tapColor.g, tapColor.b, 1 - Mathf.Clamp01((float)((nowTime - tapTime)/fadeTime)));
-                tapColor.a = _fadeAlpha.Evaluate((float)((nowTime - tapTime) / fadeTime)); //1 - Mathf.Clamp01((float)((nowTime - tapTime) / fadeTime));
+                tapColor.a = FadeAlphaCurve.Evaluate((float)((NowTime - _tapTime) / FadeTime)); //1 - Mathf.Clamp01((float)((nowTime - tapTime) / fadeTime));
                 //Debug.Log((nowTime - tapTime)/fadeTime);
-                //tapColor.a = 1 - Mathf.Clamp01((float)((nowTime - tapTime)/fadeTime));
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 circleCorners[0].GetPropertyBlock(propBlock);
                 // 设置颜色属性
@@ -96,8 +96,8 @@ namespace MusicTogether.DancingBall
             }
             else
             {
-                float radius = Mathf.Abs(beginRadius * (1 - value));
-                tapColor = styleData.tapColorGradient.Evaluate(Mathf.Abs(1-Mathf.Abs(1-value)));
+                float radius = Mathf.Abs(BeginRadius * (1 - Value));
+                tapColor = TapColorGradient.Evaluate(Mathf.Abs(1-Mathf.Abs(1-Value)));
             
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
                 circleCorners[0].GetPropertyBlock(propBlock);
@@ -106,7 +106,7 @@ namespace MusicTogether.DancingBall
                 // 应用PropertyBlock
                 for (int i = 0; i < circleCorners.Length; i++)
                 {
-                    float selfAngle = 135-(i * angle);
+                    float selfAngle = 135-(i * _angle);
                     float angleRad = selfAngle * Mathf.Deg2Rad;
                     circleCorners[i].transform.localPosition = new Vector3(radius * Mathf.Cos(angleRad), 0f, radius * Mathf.Sin(angleRad));
                     circleCorners[i].SetPropertyBlock(propBlock);
@@ -117,16 +117,16 @@ namespace MusicTogether.DancingBall
             //tapPropBlock.SetColor("_Color", tapColor);
         }
 
-        public void tap()
+        public void Tap()
         {
-            tapped = true;
+            _tapped = true;
             //Color tapColor = styleData.tapColorGradient.Evaluate(value);
             //MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
             //tapEffect.GetPropertyBlock(propBlock);
             //propBlock.SetColor("_Color", tapColor);
             //tapEffect.SetPropertyBlock(propBlock);
             tapEffect.gameObject.SetActive(true);
-            tapTime = (float)nowTime;
+            _tapTime = (float)NowTime;
         }
     }
 }

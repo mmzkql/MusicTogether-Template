@@ -1,4 +1,3 @@
-using System;
 using MusicTogether.General;
 using UnityEngine;
 using UnityEditor;
@@ -15,23 +14,28 @@ namespace MusicTogether.DancingBall
         {
             MapMaker.Instance = (MapMaker)target;
         }
-
-        public void UpdateValue()
+        new void OnEnable()
         {
             MapMaker maker = (MapMaker)target;
-            maker.UpdateValue(0);            
+            MapMaker.Instance = maker;
+        }
+
+        public void UpdateManager()
+        {
+            MapMaker maker = (MapMaker)target;
+            maker.UpdateManager(0);            
         }   
 
-        public void CreateManager()
+        /*public void CreateManager()
         {
             MapMaker maker = (MapMaker)target;
 
-            GameObject newManager = new GameObject($"RoadManager{maker.roadManagers.Length-1}");
-            newManager.transform.SetParent(maker.transform);
-            newManager.AddComponent<RoadMaker>();
+            GameObject newRoad = new GameObject($"RoadManager{maker.roadManagers.Count-1}");
+            newRoad.transform.SetParent(maker.transform);
+            newRoad.AddComponent<RoadMaker>();
             
-            maker.roadManagers.Add(newManager.GetComponent<RoadMaker>());
-            newManager.UpdateValue(maker);
-        }
+            maker.roadManagers.Add(newRoad.GetComponent<RoadMaker>());
+            newRoad.GetComponent<RoadMaker>().GetData();
+        }*/
     }
 }

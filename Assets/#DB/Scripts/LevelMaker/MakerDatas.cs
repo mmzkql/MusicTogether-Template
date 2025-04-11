@@ -7,7 +7,7 @@ using UnityEngine;
 namespace MusicTogether.DancingBall
 {
     public enum MusicDataInheritOption{Map,Last,Custom}
-    public enum StyleDataInheritOption{Map,Manager,Last,Custom}
+    public enum StyleDataInheritOption{Map,Last,Custom}
     public enum RoadPlacementStyle { Classic, Chebyshev, Free, DontChange }
     public enum FacingDirection{Up,Back,Right,Left,Front,Down}
     public enum AnimationType { Transform, Color ,Animation}
@@ -34,6 +34,7 @@ namespace MusicTogether.DancingBall
     [Serializable]
     public class BlockPlacementData
     {
+        public Vector3 placementDirection;
         public RoadPlacementStyle placementStyle;
         public float scale;
         
@@ -45,11 +46,11 @@ namespace MusicTogether.DancingBall
         [VerticalGroup("Anchor/Content/Coordinates")][PropertySpace]
         [PropertyRange(-0.5f, 0.5f), OnValueChanged("UpdateCoordinateSystemTexture")]
         
-        public float anchorx;
+        public float anchorX;
         [VerticalGroup("Anchor/Content/Coordinates")]
         [PropertyRange(-0.5f, 0.5f), OnValueChanged("UpdateCoordinateSystemTexture")]
-        public float anchory;
-        
+        public float anchorY;
+            
         
         public FacingDirection tileDirection = FacingDirection.Down;
         public bool doubleDirection;
@@ -85,8 +86,8 @@ namespace MusicTogether.DancingBall
             }
 
             // 绘制锚点
-            int anchorX = (int)((anchorx + 0.5f) * size);
-            int anchorY = (int)((anchory + 0.5f) * size);
+            int x = (int)((anchorX + 0.5f) * size);
+            int y = (int)((anchorY + 0.5f) * size);
             Color anchorColor = new Color(0.8f, 0.6f, 0.0f, 1.0f);
 
             // 绘制一个3x3的锚点
@@ -95,8 +96,8 @@ namespace MusicTogether.DancingBall
             {
                 for (int j = -r; j <= r; j++)
                 {
-                    int px = Mathf.Clamp(anchorX + i, 0, size - 1);
-                    int py = Mathf.Clamp(anchorY + j, 0, size - 1);
+                    int px = Mathf.Clamp(x + i, 0, size - 1);
+                    int py = Mathf.Clamp(y + j, 0, size - 1);
                     _anchorTexture.SetPixel(px, py, anchorColor);
                 }
             }

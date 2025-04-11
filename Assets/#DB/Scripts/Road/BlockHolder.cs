@@ -5,124 +5,54 @@ using UnityEngine.Serialization;
 
 namespace MusicTogether.DancingBall
 {
-    public class BlockStyle : MonoBehaviour
+    public class BlockHolder : MonoBehaviour
     {
-        //BasicStyle
-        //[DisableIf("@!(isTurnNode||isCorner)")] 
-        //public RoadPlacementStyle roadType;
-        //public float scale;
+        public MapHolder MapHolder => MapHolder.Instance;
+        public RoadHolder roadHolder;
+        //Information
+        [TabGroup("BlockDatas")] 
+        public int nodeIndex;
+        public bool custommTime;
+        public float nodeTime;
+        //Config
+        [TabGroup("BlockDatas")] 
+        public bool isTurn, isCorner ,teleport,jump;
         
-        /*[Title("Data")]
-        [PropertySpace]
-        [DisableIf("@inherit == true")]
-        public FacingDirection tileDirection = FacingDirection.Down;
-        [DisableIf("@inherit == true")]
-        public bool doubleDirection;
-        [DisableIf("@inherit == true||!doubleDirection")]
-        public FacingDirection tileDirection2 = FacingDirection.Down;*/
-        
-        /*[ShowInInspector, HideLabel, ReadOnly, PreviewField(ObjectFieldAlignment.Left, Height = 50)]
-        [BoxGroup("Anchor", ShowLabel = true,CenterLabel = true)][HorizontalGroup("Anchor/Content")] 
-        private Texture2D _anchorTexture;
-        
-        [PropertySpace] [PropertyRange(-0.5f, 0.5f), OnValueChanged("UpdateCoordinateSystemTexture")]
-        [VerticalGroup("Anchor/Content/Coordinates")]
-        [DisableIf("@inherit == true")]
-        public float x;
-        
-        [PropertyRange(-0.5f, 0.5f), OnValueChanged("UpdateCoordinateSystemTexture")]
-        [VerticalGroup("Anchor/Content/Coordinates")]
-        [DisableIf("@inherit == true")]
-        public float y;*/
+        //Style
+        public BlockStyleData styleData;
 
-        //AdvancedStyle
-        //public bool inheritStyleData = true;
-        
-        /*[InlineEditor(InlineEditorObjectFieldModes.Boxed)]
-        [DisableIf("@inherit == true")] 
-        public StyleData styleData;*/
-
-
-        [Title("Dependencies")] public Transform tileHolder;
+        //Prefab
+        [TabGroup("PrefabBindings")] 
+        public TapPlacer tapPlacer;
+        [TabGroup("PrefabBindings")] 
         public Animator animator;
         
-        [FormerlySerializedAs("top")] [FoldoutGroup("RoadFaces")] [VerticalGroup("RoadFaces/Hex")]
-        public MeshFilter topMesh;
-
-        [FormerlySerializedAs("back")] [HorizontalGroup("RoadFaces/Hex/Middle1")][PropertySpace(SpaceBefore = 10)]
-        //[LabelWidth(20)] 
-        public MeshFilter backMesh;
-    
+        [TabGroup("PrefabBindings")] 
+        [FoldoutGroup("RoadFaces")] [VerticalGroup("RoadFaces/Hex")]
+        public Transform topTile;
+        
         [HorizontalGroup("RoadFaces/Hex/Middle1")][PropertySpace(SpaceBefore = 10)]
-        //[LabelWidth(20)] // 缩小中间标签宽度
-        public MeshFilter leftMesh;
+        public Transform backTile;
+        
+        [HorizontalGroup("RoadFaces/Hex/Middle1")][PropertySpace(SpaceBefore = 10)]
+        public Transform leftTile;
     
         [HorizontalGroup("RoadFaces/Hex/Middle2")][PropertySpace(SpaceBefore = 10)]
-        public MeshFilter rightMesh;
+        public Transform rightTile;
 
         [HorizontalGroup("RoadFaces/Hex/Middle2")][PropertySpace(SpaceBefore = 10)]
-        public MeshFilter frontMesh;
+        public Transform frontTile;
         
         [VerticalGroup("RoadFaces/Hex")] [PropertySpace(SpaceBefore = 10)]
-        public MeshFilter bottomMesh;
+        public Transform bottomTile;
         
-        //BakingDataes
-        public Dictionary<FacingDirection, MeshFilter> _directionTransforms;
-        private FacingDirection _prevDirection;
+        //Data
+        [HideInInspector]public List<Transform> nodes = new List<Transform>();
         
-        /*private void UpdateCoordinateSystemTexture()
-        {
-            int size = 100;
-            _anchorTexture = new Texture2D(size, size);
-
-            // 透明背景
-            Color transparent = new Color(0.219f, 0.219f, 0.219f, 1.0f);
-            for (int i = 0; i < size; i++)
-            {
-                for (int j = 0; j < size; j++)
-                {
-                    _anchorTexture.SetPixel(i, j, transparent);
-                }
-            }
-
-            // 绘制坐标轴
-            Color axisColor = Color.white;
-            // X轴（从左到右）
-            for (int i = 0; i < size; i++)
-            {
-                _anchorTexture.SetPixel(i, size / 2, axisColor);
-            }
-
-            // Y轴（从下到上）
-            for (int j = 0; j < size; j++)
-            {
-                _anchorTexture.SetPixel(size / 2, j, axisColor);
-            }
-
-            // 绘制锚点
-            int anchorX = (int)((x + 0.5f) * size);
-            int anchorY = (int)((y + 0.5f) * size);
-            Color anchorColor = new Color(0.8f, 0.6f, 0.0f, 1.0f);
-
-            // 绘制一个3x3的锚点
-            int r = 5;
-            for (int i = -r; i <= r; i++)
-            {
-                for (int j = -r; j <= r; j++)
-                {
-                    int px = Mathf.Clamp(anchorX + i, 0, size - 1);
-                    int py = Mathf.Clamp(anchorY + j, 0, size - 1);
-                    _anchorTexture.SetPixel(px, py, anchorColor);
-                }
-            }
-
-            _anchorTexture.Apply();
-        }*/
-
-        public void UpdateData(RoadMaker roadMaker,int nodeIndex,bool inheritBasicStyle)
+        /*public void UpdateData(RoadMaker roadMaker,int nodeIndex,bool inheritBasicStyle)
         {
             List<int> styleIndex = roadMaker.StyleIndexes;
-            List<BlockMaker> nodes = roadMaker.nodes;
+            List<BlockMaker> nodes = roadMaker.blockMakers;
             
             int lastCornerIndex = nodes.FindLastIndex((i) =>i.nodeIndex< nodeIndex && (i.isCorner||i.isTurnNode));
             lastCornerIndex = Mathf.Clamp(lastCornerIndex, 0, styleIndex.Count - 1);
@@ -144,7 +74,7 @@ namespace MusicTogether.DancingBall
             {
                 if (nodeIndex != 0)
                 {
-                    var prevstyle = roadMaker.nodes[styleIndex[lastStyleDataIndex]].style;
+                    var prevstyle = roadMaker.blockMakers[styleIndex[lastStyleDataIndex]].style;
                     if(prevstyle.doubleDirection&& tileDirection!=prevstyle.tileDirection)
                     {
                         _prevDirection = prevstyle.tileDirection2;
@@ -170,18 +100,18 @@ namespace MusicTogether.DancingBall
                 tileHolder.GetChild(0).localEulerAngles = Vector3.zero;
             ApplyAnchor();
             ApplyTile(nodeIndex,inheritBasicStyle);
-        }
-        void ApplyTile(int index,bool inheritBasicStyle)
+        }*/
+        /*void ApplyTile(int index,bool inheritBasicStyle)
         {
             //应用朝向
             _directionTransforms = new Dictionary<FacingDirection, MeshFilter>
             {
-                { FacingDirection.Up, topMesh },
-                { FacingDirection.Down, bottomMesh },
-                { FacingDirection.Left, leftMesh },
-                { FacingDirection.Right, rightMesh },
-                { FacingDirection.Front, frontMesh },
-                { FacingDirection.Back, backMesh }
+                { FacingDirection.Up, topTile },
+                { FacingDirection.Down, bottomTile },
+                { FacingDirection.Left, leftTile },
+                { FacingDirection.Right, rightTile },
+                { FacingDirection.Front, frontTile },
+                { FacingDirection.Back, backTile }
             };
             
             foreach (var meshFilter in _directionTransforms.Values)
@@ -209,8 +139,8 @@ namespace MusicTogether.DancingBall
                     prevTarget.mesh = styleData.tileMesh;
                 }
             }
-        }
-        void ApplyAnchor()
+        }*/
+        /*void ApplyAnchor()
         {
                 // 第一层子物体：localPosition变为(0, y, x)
                 tileHolder.GetChild(0).localPosition = new Vector3(0f, y, x);
@@ -220,19 +150,19 @@ namespace MusicTogether.DancingBall
                 {
                     grandChild.localPosition = new Vector3(0f, -y, -x);
                 }
-        }
+        }*/
 
-        public void GetNodes(List<Transform> nodes)
+        /*public void GetNodes(List<Transform> nodes)
         {
             nodes.Clear();
             _directionTransforms = new Dictionary<FacingDirection, MeshFilter>
             {
-                { FacingDirection.Up, topMesh },
-                { FacingDirection.Down, bottomMesh },
-                { FacingDirection.Left, leftMesh },
-                { FacingDirection.Right, rightMesh },
-                { FacingDirection.Front, frontMesh },
-                { FacingDirection.Back, backMesh }
+                { FacingDirection.Up, topTile },
+                { FacingDirection.Down, bottomTile },
+                { FacingDirection.Left, leftTile },
+                { FacingDirection.Right, rightTile },
+                { FacingDirection.Front, frontTile },
+                { FacingDirection.Back, backTile }
             };
             Transform first = null, second = null;
             if (_directionTransforms.TryGetValue(tileDirection, out var target))
@@ -250,10 +180,10 @@ namespace MusicTogether.DancingBall
                 second = target2.transform;
             }
             nodes.Add(second);
-        }
-        private void OnEnable()
+        }*/
+        /*private void OnEnable()
         {
             UpdateCoordinateSystemTexture();
-        }
+        }*/
     }
 }

@@ -1,30 +1,10 @@
+using System;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace MusicTogether.General
 {
-    public enum InheritOption{noInherit,Last,Specified}
-    public class InheritSetting
-    {
-        public InheritOption inheritOption;
-        public int specifiedInheritIndex;
-        public int GetTargetIndex(int selfIndex)
-        {
-            targetIndex = selfIndex;
-            switch(inheritOption)
-            {
-                case InheritOption.Last:
-                    targetIndex = selfIndex-1;
-                    break;
-                case InheritOption.Specified:
-                    targetIndex = specifiedInheritIndex;
-                    break;
-                case InheritOption.noInherit:
-                    targetIndex = -2;
-                    break;
-            }
-            return targetIndex;
-        }
-    }
+   
     [Serializable]
     public struct TimeRange
     {

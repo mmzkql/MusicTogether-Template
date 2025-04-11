@@ -64,10 +64,10 @@ namespace MusicTogether.DancingLine
                 switch (type)
                 {
                     case GravitySimlationType.RealMotion:
-                        clip.displayName = $"RealMotion:{clipAsset.Height}¡ú??";
+                        clip.displayName = $"RealMotion:{clipAsset.Height}â†’??";
                         break;
                     case GravitySimlationType.FakeJump:
-                        clip.displayName = $"FakeJump:{clipAsset.BeginPoint}¡ú{clipAsset.EndPoint}";
+                        clip.displayName = $"FakeJump:{clipAsset.BeginPoint}â†’{clipAsset.EndPoint}";
                         break;
                     case GravitySimlationType.FakeFall:
                         if(clipAsset.AutoSetValue == FakeFallCalculateTarget.EndTime)
@@ -77,7 +77,7 @@ namespace MusicTogether.DancingLine
                             //float t = (float)clip.end;
                             clipAsset.EndPoint = clipAsset.BeginPoint + clipAsset.Gravity / 2 * Mathf.Pow((float)clip.end- (float)clip.start, 2);
                         }
-                        clip.displayName = $"FakeFall:{clipAsset.BeginPoint}¡ú{clipAsset.EndPoint}";
+                        clip.displayName = $"FakeFall:{clipAsset.BeginPoint}â†’{clipAsset.EndPoint}";
                         break;
                     case GravitySimlationType.Static:
 

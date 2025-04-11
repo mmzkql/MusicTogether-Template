@@ -2,7 +2,6 @@ using System;
 using JetBrains.Annotations;
 using MusicTogether.General;
 using Sirenix.OdinInspector;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 namespace MusicTogether.DancingBall
@@ -67,11 +66,11 @@ namespace MusicTogether.DancingBall
             if (UnityEditor.Selection.activeGameObject == null)
                 return false;
             
-            var blockStyle = UnityEditor.Selection.activeGameObject.GetComponent<BlockStyle>();
+            var blockStyle = UnityEditor.Selection.activeGameObject.GetComponent<BlockHolder>();
             if (blockStyle == null)
                 return false;
             
-            return UnityEditor.PrefabUtility.IsPartOfPrefabAsset(blockStyle.gameObject)||(PrefabStageUtility.GetCurrentPrefabStage() != null);
+            return UnityEditor.PrefabUtility.IsPartOfPrefabAsset(blockStyle.gameObject)||(UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage() != null);
         }
 
         // 更新路径方法
@@ -89,11 +88,11 @@ namespace MusicTogether.DancingBall
                 return;
             }
 
-            var blockStyle = UnityEditor.Selection.activeGameObject.GetComponent<BlockStyle>();
-            if (blockStyle == null) return;
+            var blockHolder = UnityEditor.Selection.activeGameObject.GetComponent<BlockHolder>();
+            if (blockHolder == null) return;
 
-            animTransformPath = GetRelativePath(blockStyle.transform, animTransform);
-            UnityEditor.EditorUtility.SetDirty(blockStyle.styleData); // 标记ScriptableObject为脏
+            animTransformPath = GetRelativePath(blockHolder.transform, animTransform);
+            UnityEditor.EditorUtility.SetDirty(blockHolder.styleData); // 标记ScriptableObject为脏
         }
 
         private string GetRelativePath(Transform root, Transform target)
@@ -127,19 +126,16 @@ namespace MusicTogether.DancingBall
     }
     
     [CreateAssetMenu(menuName = "MTDancingBal/BrickStyle", fileName = "NewBrickStyle")]
-    public class StyleData : ScriptableObject
+    public class BlockStyleData : ScriptableObject
     {
         [FoldoutGroup("BasicData")]
         [PreviewField]
-        public GameObject blockPrefab,tapPlacerPrefab;
+        public GameObject blockPrefab;
+        [InlineEditor(InlineEditorObjectFieldModes.Boxed)]
+        public TapPlacerData tapPlacerData;
+
         
-        public Gradient tapColorGradient;
-        public TimeRange tapTimeRange=new TimeRange(-2,2);
-        public float fadeTime;
-        public AnimationCurve fadeAlpha;
-        public float beginRadius;
-        
-        [FoldoutGroup("EnhancementData")] public bool antiClipping;
+        //[FoldoutGroup("EnhancementData")] public bool antiClipping;
         
         [HideLabel,PropertySpace]
         [FoldoutGroup("StyleData")] public TimeRange timeRange;

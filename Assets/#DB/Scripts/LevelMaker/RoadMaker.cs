@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using MusicTogether.General;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UIElements;
@@ -11,36 +13,108 @@ namespace MusicTogether.DancingBall
     public class RoadMaker : MonoBehaviour
     {
         //Dependencies
-        public MapMaker mapMaker=>MapMaker.Instance;
+        private static MapMaker MapMaker=>MapMaker.Instance;
+        public RoadHolder roadHolder;
         
         [EnumToggleButtons]public MusicDataInheritOption managerDataOption;
+
         [InlineEditor(InlineEditorObjectFieldModes.Boxed)]
-        public MusicData customMusicData;
-        [FormerlySerializedAs("defaultRoadStyle")] [InlineEditor(InlineEditorObjectFieldModes.Boxed)]
-        public Block defaultRoad;
+        [LabelText("customMusicData")]
+        [ShowIf("@managerDataOption == MusicDataInheritOption.Custom")]
+        private MusicData musicData
+        {
+            get
+            {
+                return roadHolder.musicData;
+            }
+            set
+            {
+                roadHolder.musicData = value;
+            }
+        }
+        
+        [InlineEditor(InlineEditorObjectFieldModes.Boxed)]
+        public BlockHolder defaultRoad;
         //basicConfig
-        public int noteBegin, noteEnd;
-        public bool justifyPlacement;
+        private int NoteBegin => roadHolder.noteBegin;
+        private int NoteEnd=>roadHolder.noteEnd;
+        public bool manageChildren ;
         
         [Title("Manager")]
-        public List<BlockMaker> nodes;
+        public List<BlockMaker> blockMakers;
+        
+        //MakingProcess
+        public void UpdateData(int index)
+        {
+            int selfIndex = index;
+            //int targetIndex=0;
+            switch (managerDataOption)
+            {
+                case MusicDataInheritOption.Custom:
+                    break;
+                case MusicDataInheritOption.Last:
+                    if (selfIndex > 0)
+                    {
+                        musicData = MapMaker.roadManagers[selfIndex - 1].musicData;
+                    }
+                    else
+                    {
+                        managerDataOption = MusicDataInheritOption.Map;
+                        goto case MusicDataInheritOption.Map;
+                    }
+                    break;
+                case MusicDataInheritOption.Map:
+                    musicData = MapMaker.mapMusicData;
+                    break;
+            }
+
+            UpdateBlockManagement();
+        }
+        public void UpdateData(int index,RoadHolder targetRoadHolder)
+        {
+            roadHolder = targetRoadHolder;
+            UpdateData(index);
+        }
+        public void UpdateBlockManagement()
+        {
+            blockMakers.Clear();
+            blockMakers = GetComponentsInChildren<BlockMaker>().ToList();
+            //GetComponentsInChildren<BlockMaker>().ForEach(blockMaker => nodes.Add(blockMaker));
+            blockMakers.Sort((a, b) => a.targetBlockHolder.nodeIndex.CompareTo(b.targetBlockHolder.nodeIndex));
+            roadHolder.blockHodlers.Clear();
+            blockMakers.ForEach(x => roadHolder.blockHodlers.Add(x.targetBlockHolder));
+        }
+
+        public void UpdateBlockData(int begin)
+        {
+            for (int i = begin; i < blockMakers.Count; i++)
+            {
+                blockMakers[i].UpdateBlockData(this,i);
+            }
+        }
+
+        public void UpdateBlockPosAndStyle(int begin)
+        {
+            for (int i = begin; i < blockMakers.Count; i++)
+            {
+                blockMakers[i].UpdateBlockPosition(i);
+                blockMakers[i].UpdateBlockStyle(i);
+            }
+        }
         
         
         
         
         
         
-        
-        
-        
-        [Button]
+        /*[Button]
         public void UpdateValue()
         {
-            for (int i = 0; i < nodes.Count; i++)
+            for (int i = 0; i < blockMakers.Count; i++)
             {
-                nodes[i].ResetValue(this, i);
-                nodes[i].name = $"Block {i}";
-                nodes[i].transform.SetSiblingIndex(i);
+                blockMakers[i].ResetValue(this, i);
+                blockMakers[i].name = $"Block {i}";
+                blockMakers[i].transform.SetSiblingIndex(i);
             }
         }
         public void UpdateBlockStyle(int begin)
@@ -49,11 +123,11 @@ namespace MusicTogether.DancingBall
             {
                 UpdateValue();
             }
-            for (int i = begin; i < nodes.Count; i++)
+            for (int i = begin; i < blockMakers.Count; i++)
             {
                 if (i < 0)
                     i = 0;
-                nodes[i].UpdateStyle();
+                blockMakers[i].UpdateStyle();
                 
             }
         }
@@ -63,19 +137,19 @@ namespace MusicTogether.DancingBall
             {
                 UpdateValue();
             }
-            for (int i = begin; i < nodes.Count; i++)
+            for (int i = begin; i < blockMakers.Count; i++)
             {
                 if (i < 0)
                     i = 0;
-                nodes[i].UpdateStyle();
+                blockMakers[i].UpdateStyle();
                 
             }
-            for (int i = 0; i < nodes.Count; i++)
+            for (int i = 0; i < blockMakers.Count; i++)
             {
                 float length = Scale;//Mathf.Ceil(Nodes[i+1].nodeIndex - Nodes[i].nodeIndex) * Scale
-                nodes[i+1].UpdatePosition(i, length);
+                blockMakers[i+1].UpdatePosition(i, length);
             }
-        }
+        }*/
     }
 }
 
