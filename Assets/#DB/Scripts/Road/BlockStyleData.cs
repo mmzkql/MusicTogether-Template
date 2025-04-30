@@ -125,7 +125,7 @@ namespace MusicTogether.DancingBall
 #endif
     }
     
-    [CreateAssetMenu(menuName = "MTDancingBal/BrickStyle", fileName = "NewBrickStyle")]
+    [CreateAssetMenu(menuName = "MTDancingBal/BlockStyle", fileName = "BlockStyle_styleName")]
     public class BlockStyleData : ScriptableObject
     {
         [FoldoutGroup("BasicData")]

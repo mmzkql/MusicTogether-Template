@@ -22,28 +22,38 @@ namespace MusicTogether.DancingBall
         public BlockStyleData styleData;
 
         //Prefab
+        [TabGroup("PrefabBindings")]
+        public Transform anchorBlock;
+        [TabGroup("PrefabBindings")]
+        public Renderer debugBlock;
         [TabGroup("PrefabBindings")] 
         public TapPlacer tapPlacer;
         [TabGroup("PrefabBindings")] 
         public Animator animator;
         
-        [TabGroup("PrefabBindings")] 
-        [FoldoutGroup("RoadFaces")] [VerticalGroup("RoadFaces/Hex")]
+        [TabGroup("PrefabBindings")]
+        //[VerticalGroup("PrefabBindings/Hex")]
+        [PropertySpace(SpaceBefore = 10)]
         public Transform topTile;
-        
-        [HorizontalGroup("RoadFaces/Hex/Middle1")][PropertySpace(SpaceBefore = 10)]
+
+        [TabGroup("PrefabBindings")]
+        //[HorizontalGroup("PrefabBindings/Hex/Middle1")][PropertySpace(SpaceBefore = 10)]
         public Transform backTile;
-        
-        [HorizontalGroup("RoadFaces/Hex/Middle1")][PropertySpace(SpaceBefore = 10)]
+
+        [TabGroup("PrefabBindings")]
+        //[HorizontalGroup("PrefabBindings/Hex/Middle1")][PropertySpace(SpaceBefore = 10)]
         public Transform leftTile;
-    
-        [HorizontalGroup("RoadFaces/Hex/Middle2")][PropertySpace(SpaceBefore = 10)]
+
+        [TabGroup("PrefabBindings")]
+        //[HorizontalGroup("PrefabBindings/Hex/Middle2")][PropertySpace(SpaceBefore = 10)]
         public Transform rightTile;
 
-        [HorizontalGroup("RoadFaces/Hex/Middle2")][PropertySpace(SpaceBefore = 10)]
+        [TabGroup("PrefabBindings")]
+        //[HorizontalGroup("PrefabBindings/Hex/Middle2")][PropertySpace(SpaceBefore = 10)]
         public Transform frontTile;
-        
-        [VerticalGroup("RoadFaces/Hex")] [PropertySpace(SpaceBefore = 10)]
+
+        [TabGroup("PrefabBindings")]
+        //[VerticalGroup("PrefabBindings/Hex")] [PropertySpace(SpaceBefore = 10)]
         public Transform bottomTile;
         
         //Data

@@ -14,10 +14,10 @@ namespace MusicTogether.DancingBall
         [HideInInspector]public RoadMaker targetRoadMaker;
         [TabGroup("PrefabBindings")]
         public BlockHolder targetBlockHolder;
+        [TabGroup("PrefabBindings")] 
+        public Transform AnchorBlock=>targetBlockHolder.anchorBlock;
         [TabGroup("PrefabBindings")]
-        public Transform anchorBlock;
-        [TabGroup("PrefabBindings")]
-        public Renderer debugBlock;
+        public Renderer DebugBlock=>targetBlockHolder.debugBlock;
         
         //Data
         public int BlockIndex
@@ -37,7 +37,9 @@ namespace MusicTogether.DancingBall
             get => targetBlockHolder.isCorner;
             set => targetBlockHolder.isCorner = value;
         }
-        [TabGroup("BlockData")] 
+        [TabGroup("BlockData")]
+        public BlockPlacementData _selfPlacementData;
+        [TabGroup("BlockData")]
         public BlockPlacementData placementData;
         [TabGroup("BlockData")] 
         public StyleDataInheritOption styleDataOption;
@@ -89,6 +91,7 @@ namespace MusicTogether.DancingBall
             switch (styleDataOption)
             {
                 case StyleDataInheritOption.Custom:
+                    placementData = _selfPlacementData;
                     break;
                 case StyleDataInheritOption.Last:
                     if (BlockIndex > 0)
@@ -102,7 +105,7 @@ namespace MusicTogether.DancingBall
                     }
                     break;
                 case StyleDataInheritOption.Map:
-                    StyleData = TargetMapMaker.mapStyleData;
+                    StyleData = TargetMapMaker.mapBlockStyleData;
                     break;
             }
         }
@@ -112,19 +115,25 @@ namespace MusicTogether.DancingBall
             BlockIndex = selfIndex;
             UpdateBlockData();
         }
-
-        public void UpdateBlockPosition(int selfIndex)
+        public void UpdateBlockData(RoadMaker roadMaker,BlockHolder blockHolder,int selfIndex)
         {
-            
+            targetRoadMaker = roadMaker;
+            targetBlockHolder = blockHolder;
+            BlockIndex = selfIndex;
+            UpdateBlockData();
+        }
+
+        public void UpdateBlockPosition()
+        {
             //position
-            if (selfIndex < 1)
+            if (BlockIndex < 1)
             {
                 targetRoadMaker.transform.Translate(transform.localPosition,Space.World);
                 transform.localPosition = Vector3.zero;
                 return;
             }
             
-            BlockMaker previousBlockMaker = targetRoadMaker.blockMakers[selfIndex-1];
+            BlockMaker previousBlockMaker = targetRoadMaker.blockMakers[BlockIndex-1];
             Vector3 prevPosition = previousBlockMaker.transform.position;
             Vector3 prevDirection = previousBlockMaker.placementData.placementDirection;
             float length = (placementData.scale + previousBlockMaker.placementData.scale)/2f;
@@ -141,18 +150,22 @@ namespace MusicTogether.DancingBall
             //anchor
             float anchorX = placementData.anchorX;
             float anchorY = placementData.anchorY;
-            anchorBlock.localPosition = new Vector3(0,-anchorY,-anchorX);
-            anchorBlock.GetChild(0).localPosition = new Vector3(0, anchorY,anchorX);
-            anchorBlock.localRotation = Quaternion.Euler(DirectionToEulerAngles(direction));
+            AnchorBlock.localPosition = new Vector3(0,-anchorY,-anchorX);
+            foreach(Transform child in AnchorBlock.GetComponentsInChildren<Transform>())
+            {
+                child.localPosition = new Vector3(0, anchorY, anchorX);
+            }
+            //AnchorBlock.GetChild(0).localPosition = new Vector3(0, anchorY,anchorX);
+            AnchorBlock.localRotation = Quaternion.Euler(DirectionToEulerAngles(direction));
         }
 
-        public void UpdateBlockStyle(int selfIndex)
+        public void UpdateBlockStyle()
         {
             //ResourceHandle
-            Undo.DestroyObjectImmediate(anchorBlock.GetChild(0).gameObject);
+            Undo.DestroyObjectImmediate(AnchorBlock.GetChild(0).gameObject);
             
             //Block Spawn
-            GameObject block = Instantiate(StyleData.blockPrefab, anchorBlock, true);
+            GameObject block = Instantiate(StyleData.blockPrefab, AnchorBlock, true);
             
             Undo.RegisterCreatedObjectUndo(block, "Create block");
             float anchorX = placementData.anchorX;
@@ -182,12 +195,11 @@ namespace MusicTogether.DancingBall
                 tile.gameObject.SetActive(false);
             }
 
-            Transform activeTile = null;
-            if (_directionTransforms.TryGetValue(placementData.tileDirection, out activeTile))
+            if (_directionTransforms.TryGetValue(placementData.tileDirection, out var activeTile))
             {
                 activeTile.gameObject.SetActive(true);
             }
-            if (placementData.doubleDirection || (selfIndex > 0 && (targetBlockHolder.isTurn||targetBlockHolder.isCorner)))
+            if (placementData.doubleDirection || (BlockIndex > 0 && (targetBlockHolder.isTurn||targetBlockHolder.isCorner)))
             {
                 if(_directionTransforms.TryGetValue(placementData.tileDirection2, out var target2))
                 {
@@ -251,17 +263,17 @@ namespace MusicTogether.DancingBall
             transform.position = target;
         }*/
         
-        public void DebugStyle()
+        public void UpdateDebugStyle()
         {
-            if (debugBlock != null)
+            if (DebugBlock != null)
             {
                 MaterialPropertyBlock propBlock = new MaterialPropertyBlock();
-                debugBlock.GetPropertyBlock(propBlock);
+                DebugBlock.GetPropertyBlock(propBlock);
             
                 // 设置颜色属性
                 propBlock.SetColor("_Color", DebugMaskColor);
                 // 应用PropertyBlock
-                debugBlock.SetPropertyBlock(propBlock);
+                DebugBlock.SetPropertyBlock(propBlock);
             }
         }
 
@@ -307,7 +319,7 @@ namespace MusicTogether.DancingBall
             }
         }*/
 
-        public static Vector3 PlacingDirection(RoadPlacementStyle placementType,Vector3 prevPosition, Vector3 direction, float length)
+        private static Vector3 PlacingDirection(RoadPlacementStyle placementType,Vector3 prevPosition, Vector3 direction, float length)
         {
             Vector3 finalDirection = direction.normalized*length;
             switch (placementType)
@@ -329,7 +341,8 @@ namespace MusicTogether.DancingBall
             }
             return finalDirection;
         }
-        public static Vector3 DirectionToEulerAngles(Vector3 direction)
+
+        private static Vector3 DirectionToEulerAngles(Vector3 direction)
         {
             // 归一化方向向量（确保是单位向量）
             direction = direction.normalized;
@@ -388,5 +401,39 @@ namespace MusicTogether.DancingBall
             Vector3 endPoint = startPoint + scaledDirection;
             return endPoint;
         }*/
+
+
+
+
+#if UNITY_EDITOR
+        public void PrefabUpdate()
+        {
+            switch (styleDataOption)
+            {
+                case StyleDataInheritOption.Custom:
+                    placementData = _selfPlacementData;
+                    break;
+                case StyleDataInheritOption.Last:
+                    if (BlockIndex > 0)
+                    {
+                        StyleData = targetRoadMaker.blockMakers[BlockIndex - 1].StyleData;
+                    }
+                    else
+                    {
+                        styleDataOption = StyleDataInheritOption.Map;
+                        goto case StyleDataInheritOption.Map;
+                    }
+                    break;
+                case StyleDataInheritOption.Map:
+                    StyleData = TargetMapMaker.mapBlockStyleData;
+                    break;
+            }
+        }
+
+        private void OnValidate()
+        {
+            PrefabUpdate();
+        }
+#endif
     }
 }

@@ -15,9 +15,13 @@ namespace MusicTogether.DancingBall
         //Dependencies
         private static MapMaker MapMaker=>MapMaker.Instance;
         public RoadHolder roadHolder;
-        
-        [EnumToggleButtons]public MusicDataInheritOption managerDataOption;
 
+        public int RoadIndex
+        {
+            get => roadHolder.roadIndex;
+            set => roadHolder.roadIndex = value;
+        }
+        [EnumToggleButtons]public MusicDataInheritOption musicDataOption;
         [InlineEditor(InlineEditorObjectFieldModes.Boxed)]
         [LabelText("customMusicData")]
         [ShowIf("@managerDataOption == MusicDataInheritOption.Custom")]
@@ -32,9 +36,10 @@ namespace MusicTogether.DancingBall
                 roadHolder.musicData = value;
             }
         }
-        
+
+        public bool customRoadBlockHolder;
         [InlineEditor(InlineEditorObjectFieldModes.Boxed)]
-        public BlockHolder defaultRoad;
+        public GameObject roadBlockHolderPrefab;
         //basicConfig
         private int NoteBegin => roadHolder.noteBegin;
         private int NoteEnd=>roadHolder.noteEnd;
@@ -44,22 +49,50 @@ namespace MusicTogether.DancingBall
         public List<BlockMaker> blockMakers;
         
         //MakingProcess
-        public void UpdateData(int index)
+        public BlockMaker CreateNewBlock(int targetIndex)
         {
-            int selfIndex = index;
-            //int targetIndex=0;
-            switch (managerDataOption)
+            GameObject newBlock = new GameObject($"RoadHolder ({targetIndex})");
+            newBlock.transform.SetParent(transform);
+            newBlock.transform.localPosition = Vector3.zero;
+            newBlock.transform.localRotation = Quaternion.identity;
+            newBlock.transform.localScale = Vector3.one;
+            
+            BlockMaker maker = newBlock.AddComponent<BlockMaker>();
+            BlockHolder holder = newBlock.transform.GetComponentInChildren<BlockHolder>();
+            maker.UpdateBlockData(this,holder, targetIndex);
+            
+            return maker;
+        }
+
+        public void UpdateBlockList()
+        {
+            blockMakers.Clear();
+            roadHolder.blockHodlers.Clear();
+            
+            blockMakers = GetComponentsInChildren<BlockMaker>().ToList();
+            blockMakers.Sort((a,b)=>a.BlockIndex.CompareTo(b.BlockIndex));
+
+            foreach (BlockMaker blockMaker in blockMakers)
+            {
+                blockMaker.gameObject.name = $"Block ({blockMaker.BlockIndex})";
+                roadHolder.blockHodlers.Add(blockMaker.targetBlockHolder);
+            }
+        }
+        
+        public void UpdateData()
+        {
+            switch (musicDataOption)
             {
                 case MusicDataInheritOption.Custom:
                     break;
                 case MusicDataInheritOption.Last:
-                    if (selfIndex > 0)
+                    if (RoadIndex > 0)
                     {
-                        musicData = MapMaker.roadManagers[selfIndex - 1].musicData;
+                        musicData = MapMaker.roadMakers[RoadIndex - 1].musicData;
                     }
                     else
                     {
-                        managerDataOption = MusicDataInheritOption.Map;
+                        musicDataOption = MusicDataInheritOption.Map;
                         goto case MusicDataInheritOption.Map;
                     }
                     break;
@@ -68,21 +101,21 @@ namespace MusicTogether.DancingBall
                     break;
             }
 
-            UpdateBlockManagement();
+            if (!customRoadBlockHolder)
+            {
+                roadBlockHolderPrefab = MapMaker.mapBlockHolderPrefab;
+            }
+            UpdateBlockList();
+        }
+        public void UpdateData(int index)
+        {
+            RoadIndex = index;
+            UpdateData();
         }
         public void UpdateData(int index,RoadHolder targetRoadHolder)
         {
             roadHolder = targetRoadHolder;
             UpdateData(index);
-        }
-        public void UpdateBlockManagement()
-        {
-            blockMakers.Clear();
-            blockMakers = GetComponentsInChildren<BlockMaker>().ToList();
-            //GetComponentsInChildren<BlockMaker>().ForEach(blockMaker => nodes.Add(blockMaker));
-            blockMakers.Sort((a, b) => a.targetBlockHolder.nodeIndex.CompareTo(b.targetBlockHolder.nodeIndex));
-            roadHolder.blockHodlers.Clear();
-            blockMakers.ForEach(x => roadHolder.blockHodlers.Add(x.targetBlockHolder));
         }
 
         public void UpdateBlockData(int begin)
@@ -97,15 +130,27 @@ namespace MusicTogether.DancingBall
         {
             for (int i = begin; i < blockMakers.Count; i++)
             {
-                blockMakers[i].UpdateBlockPosition(i);
-                blockMakers[i].UpdateBlockStyle(i);
+                blockMakers[i].UpdateBlockPosition();
+                blockMakers[i].UpdateBlockStyle();
             }
         }
-        
-        
-        
-        
-        
+
+        [ButtonGroup("MakerTools")]
+        public void UpdateBlockListTool()
+        {
+            UpdateBlockList();
+        }
+        [ButtonGroup("MakerTools")]
+        public void UpdateBlockDataTool()
+        {
+            UpdateBlockData(0);
+        }
+
+        [ButtonGroup("MakerTools")]
+        public void UpdateBlockPosAndStyleTool()
+        {
+            UpdateBlockPosAndStyle(0);
+        }
         
         /*[Button]
         public void UpdateValue()

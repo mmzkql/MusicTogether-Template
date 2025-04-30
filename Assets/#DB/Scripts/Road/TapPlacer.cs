@@ -31,7 +31,7 @@ namespace MusicTogether.DancingBall
         private AnimationCurve FadeAlphaCurve=>tapPlacerData.fadeAlphaCurve;
         
         
-        public int noteIndex;
+        private int noteIndex;
         private TimeRange _tapTimeRange = new TimeRange(0,0);
         private float _angle;
         private float _tapTime;
@@ -40,15 +40,16 @@ namespace MusicTogether.DancingBall
         private bool _enabled = false,_tapped = false;
         
         //private MaterialPropertyBlock circlePropBlock = new MaterialPropertyBlock(),tapPropBlock= new MaterialPropertyBlock();
-        public Color tapColor;
+        private Color tapColor;
         // Start is called before the first frame update
-        public void StartTap(BlockHolder blockHolder,int bpm,NoteType noteType,int note)
+        public void StartTap(BlockHolder blockHolder,int bpm,NoteType noteType)
         {
             noteIndex=blockHolder.nodeIndex + blockHolder.roadHolder.noteBegin;
+
             //note = blockNode.nodeIndex + blockNode.nodeManager.begin;
             _angle = 360/circleCorners.Length;
-            _tapTimeRange.startTime = (float)InputNoteDatas.GetTime(bpm, noteType, TapTimeRange.startTime);//note+styleData.tapTimeRange.startTime
-            _tapTimeRange.endTime = (float)InputNoteDatas.GetTime(bpm, noteType, TapTimeRange.endTime);//note+styleData.tapTimeRange.endTime
+            _tapTimeRange.startTime = (float)InputNoteDatas.GetTime(bpm, noteType, TapTimeRange.startTime+ noteIndex);//note+styleData.tapTimeRange.startTime
+            _tapTimeRange.endTime = (float)InputNoteDatas.GetTime(bpm, noteType, TapTimeRange.endTime+ noteIndex);//note+styleData.tapTimeRange.endTime
             
             //circleCorners[0].GetPropertyBlock(circlePropBlock);
             //tapEffect.GetPropertyBlock(tapPropBlock);

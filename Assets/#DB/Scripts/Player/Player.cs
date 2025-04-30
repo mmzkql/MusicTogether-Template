@@ -18,7 +18,7 @@ namespace MusicTogether.DancingBall
         public static Player Instance;
         
         private PlayableDirector Director=>MapHolder.director;
-        private float NowTime=>(float)MapHolder.director.time;
+        private float NowTime => (float)MapHolder.NowTime;
         
         
         public int targetRoadIndex;

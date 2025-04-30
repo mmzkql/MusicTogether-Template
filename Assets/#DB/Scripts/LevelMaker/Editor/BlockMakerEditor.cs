@@ -13,6 +13,11 @@ namespace MusicTogether.DancingBall
         {
             BlockMaker blockMaker = (BlockMaker)target;
         }
+        private void OnEnable()
+        {
+            BlockMaker blockMaker = (BlockMaker)target;
+            blockMaker.PrefabUpdate();
+        }
 
         private void DrawLabel(BlockMaker maker)
         {
@@ -69,5 +74,11 @@ namespace MusicTogether.DancingBall
             Vector3 direction = (nextMaker.transform.position - maker.transform.position).normalized;
             maker.placementData.placementDirection = direction;
         }
+
+        /*private void OnValidate()
+        {
+            BlockMaker blockMaker = (BlockMaker)target;
+            blockMaker.PrefabUpdate();
+        }*/
     }
 }
